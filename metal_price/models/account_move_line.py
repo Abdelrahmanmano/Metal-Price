@@ -25,9 +25,9 @@ class AccountMoveLine(models.Model):
 
     @api.depends('price_total')
     def _inverse_totals(self):
-        tax_val = self.price_total - self.price_total * (1 - (15 / 100.0))
-        self.price_subtotal = self.price_total - tax_val
-        self.price_unit = (self.price_total - tax_val) / self.quantity
+        tax_amount = sum(tax.amount for tax in self.tax_ids)
+        self.price_subtotal = self.price_total * 100 / (100 + tax_amount)
+        self.price_unit = self.price_subtotal / self.quantity
 
     @api.depends('price_subtotal')
     def _inverse_subtotals(self):
